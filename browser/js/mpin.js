@@ -603,7 +603,7 @@ var mpin = mpin || {};
     //set Temporary params if enter email and then press tooltip without submit request...
     function setTemp () {
       self.tmp || (self.tmp = {});
-      self.tmp.setupEmail = document.getElementById("emailInput").value;
+      self.tmp.setupEmail = document.getElementById("emailInput").value.toLowerCase();
       if (self.opts.setDeviceName) {
         self.tmp.setupDeviceName = document.getElementById("deviceInput").value;
       }
@@ -671,7 +671,7 @@ var mpin = mpin || {};
     //set Temporary params if enter email and then press tooltip without submit request...
     function setTemp () {
       self.tmp || (self.tmp = {});
-      self.tmp.setup2Email = document.getElementById("emailInput").value;
+      self.tmp.setup2Email = document.getElementById("emailInput").value.toLowerCase();
       if (self.opts.setDeviceName) {
         self.tmp.setup2DeviceName = document.getElementById("deviceInput").value;
       }
@@ -1712,7 +1712,7 @@ var mpin = mpin || {};
   mpin.prototype.actionSetupHome = function (uId) {
     var self = this, _email, _deviceName, _deviceNameInput, removeError, elems = [];
 
-    _email = (uId) ? uId : document.getElementById("emailInput").value;
+    _email = (uId) ? uId : document.getElementById("emailInput").value.toLowerCase();
     _deviceNameInput = (document.getElementById("deviceInput")) ? document.getElementById("deviceInput").value.trim() : "";
 
     if ((_email.length === 0 || !this.opts.identityCheckRegex.test(_email)) && !(this.opts.prerollid)) {

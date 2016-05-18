@@ -1682,7 +1682,7 @@ var mpin = mpin || {};
 
         var _email, _deviceName, _deviceNameInput, _reqData = {}, self = this, elems = [], removeError;
 
-        _email = (uId) ? uId : document.getElementById("emailInput").value;
+        _email = (uId) ? uId : document.getElementById("emailInput").value.toLowerCase();
 
         if (_email.length === 0 || !this.opts.emailCheckRegex.test(_email)) {
             document.getElementById("emailInput").focus();
