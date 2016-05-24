@@ -40,4 +40,4 @@ The built app should be placed in `<work-dir>/build/out/browser` or `<work-dir>/
 
 **NOTE** that the `settings.json` file that was created above, should be modified with the correct base URL for the PIN Pad resources and with the desired template. For more details see the bellow documentation.
 
-For further details on M-Pin Core, see the [M-Pin Core Documentation](http://docs.miracl.com/m-pin-core).
+For further details on Milagro, please see the [Milagro Documentation](http://docs.milagro.io/en/)
