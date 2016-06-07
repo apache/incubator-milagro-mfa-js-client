@@ -1115,7 +1115,28 @@ var mpin = mpin || {};
       }
 
       self.successLogin.call(self, accData);
+    }, function (accData) {
+        return self.updateStatus(accData);;
     });
+  };
+
+  mpin.prototype.updateStatus = function (statusData) {
+    var statusText;
+
+    switch (statusData.status) {
+      case "wid":
+        statusText = "<span>Code scanned.<br/>Waiting for authentication...</span>";
+        break;
+      case "user":
+        statusText = "<span>Authenticating user:<br/>" + statusData.userId + "</span>";
+        break;
+      case "expired":
+        statusText = "<span>Authentication expired!</span>";
+        break;
+    }
+
+    document.getElementById("mp_qrcode").removeAttribute('title');
+    statusText && (document.getElementById("mp_qrcode").innerHTML = statusText);
   };
 
   mpin.prototype.renderMobileSetup = function () {
