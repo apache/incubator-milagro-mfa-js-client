@@ -73,7 +73,8 @@ var mpin = mpin || {};
       }
 
       self.mpinLib = new mpinjs({
-        server: mpinServer
+        server: mpinServer,
+        authProtocols: options.authProtocols || ""
       });
 
       domID = options.targetElement;
