@@ -13,6 +13,14 @@ The PIN Pad is a JavaScript software component that should be integrated into th
 
 The Mobile App is a JavaScript application, much similar to the PIN Pad. The Mobile App also carries out the operations needed to register and authenticate an end-user, but the user is authenticated to a browser session, rather than to a session on the mobile device.
 
+##Building automatically the PIN Pad
+You can run the following script to install all dependencies for you and build both the PIN PAD and Mobile App
+```
+    > ./build.sh
+```
+It is building with default Milagro theme.
+The built apps should be placed in `<work-dir>/build/out/browser` and `<work-dir>/build/out/mobile`.
+
 ##Building the PIN Pad
 
 1. NOTE: You might have to update your package distribution system. For Ubuntu you would need to do: `sudo apt-get update`

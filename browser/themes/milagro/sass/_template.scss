@@ -367,6 +367,13 @@ $BGCOLOR6: #ef984a;
 @mixin buttons-box() {
 	padding: 5% 5%;
 	z-index: 99;
+	
+	.qrCodeArea {
+		width: 160px;
+		height: 160px;
+		display: block;
+		margin: 0 auto 20px;
+	}
 }
 
 @mixin mpin-input-field () {

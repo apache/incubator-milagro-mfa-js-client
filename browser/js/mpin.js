@@ -21,10 +21,9 @@ var mpin = mpin || {};
 
 (function () {
   "use strict";
-  var lang = {}, hlp = {}, loader, MPIN_URL_BASE, IMAGES_PATH, CSS_FILENAME, TEMPLATE_NAME;
+  var lang = {}, hlp = {}, loader, MPIN_URL_BASE, IMAGES_PATH, CSS_FILENAME;
   MPIN_URL_BASE = "%URL_BASE%";
-  TEMPLATE_NAME = "%TEMPLATE_NAME%";
-  IMAGES_PATH = MPIN_URL_BASE + "/images/" + TEMPLATE_NAME + "/";
+  IMAGES_PATH = MPIN_URL_BASE + "/images/";
 
   CSS_FILENAME = "main.css";
 
@@ -74,7 +73,8 @@ var mpin = mpin || {};
       }
 
       self.mpinLib = new mpinjs({
-        server: mpinServer
+        server: mpinServer,
+        authProtocols: options.authProtocols || ""
       });
 
       domID = options.targetElement;
@@ -439,8 +439,44 @@ var mpin = mpin || {};
     this.mpinLib.cancelMobileAuth();
   };
 
-  //	Access NUMBER
   mpin.prototype.renderMobile = function () {
+    var callbacks = {}, self = this;
+
+    this.clrInterval();
+
+    if (this.opts.requestOTP === "1") {
+      this.renderMobileSetup();
+      return;
+    }
+
+    callbacks.mpin_home = function (evt) {
+      self.clrInterval.call(self);
+      self.renderHome.call(self, evt);
+    };
+
+    callbacks.mpin_action_setup = function () {
+      self.clrInterval.call(self);
+      if (self.opts.mobileConfigURL) {
+        self.renderMobileConfig.call(self);
+      } else {
+        self.renderMobileSetup.call(self);
+      }
+    };
+
+    callbacks.mpin_desktop = function () {
+      self.clrInterval.call(self);
+      self.renderDesktop.call(self);
+    };
+
+    this.render("mobile-qr", callbacks, {mobileOnly: !this.opts.mobileOnly});
+
+    setTimeout(function () {
+      self.getQrParams.call(self);
+    }, 0);
+  };
+
+  //	Access NUMBER
+  mpin.prototype.renderMobileAN = function () {
     var callbacks = {}, self = this;
 
     this.clrInterval();
@@ -487,6 +523,8 @@ var mpin = mpin || {};
       self.getAccessNumber.call(self);
     }, 0);
   };
+
+
 
   mpin.prototype.renderHelp = function (tmplName, callbacks, tmplData) {
     var k, self = this;
@@ -603,7 +641,7 @@ var mpin = mpin || {};
     //set Temporary params if enter email and then press tooltip without submit request...
     function setTemp () {
       self.tmp || (self.tmp = {});
-      self.tmp.setupEmail = document.getElementById("emailInput").value;
+      self.tmp.setupEmail = document.getElementById("emailInput").value.toLowerCase();
       if (self.opts.setDeviceName) {
         self.tmp.setupDeviceName = document.getElementById("deviceInput").value;
       }
@@ -671,7 +709,7 @@ var mpin = mpin || {};
     //set Temporary params if enter email and then press tooltip without submit request...
     function setTemp () {
       self.tmp || (self.tmp = {});
-      self.tmp.setup2Email = document.getElementById("emailInput").value;
+      self.tmp.setup2Email = document.getElementById("emailInput").value.toLowerCase();
       if (self.opts.setDeviceName) {
         self.tmp.setup2DeviceName = document.getElementById("deviceInput").value;
       }
@@ -984,6 +1022,27 @@ var mpin = mpin || {};
     this.clrInterval.call(this);
   };
 
+  mpin.prototype.getQrParams = function () {
+    var self = this;
+    this.mpinLib.getQrUrl("", function (err, data) {
+      var qrElem, expireAfter;
+      if (err) {
+        self.error(4010);
+      }
+
+      var qrElem = document.getElementById("mp_qrcode");
+      new QRCode(qrElem, {
+        text: data.qrUrl,
+        width: 158,
+        height: 158
+      });
+
+      expireAfter = data.ttlSeconds;
+
+      self._getAccess.call(self, expireAfter);
+    });
+  };
+
   mpin.prototype.getAccessNumber = function () {
     var self = this, drawTimer, timerEl, timer2d, totalSec, timerExpire, expire;
 
@@ -1057,7 +1116,28 @@ var mpin = mpin || {};
       }
 
       self.successLogin.call(self, accData);
+    }, function (accData) {
+        return self.updateStatus(accData);;
     });
+  };
+
+  mpin.prototype.updateStatus = function (statusData) {
+    var statusText;
+
+    switch (statusData.status) {
+      case "wid":
+        statusText = "<span>Code scanned.<br/>Waiting for authentication...</span>";
+        break;
+      case "user":
+        statusText = "<span>Authenticating user:<br/>" + statusData.userId + "</span>";
+        break;
+      case "expired":
+        statusText = "<span>Authentication expired!</span>";
+        break;
+    }
+
+    document.getElementById("mp_qrcode").removeAttribute('title');
+    statusText && (document.getElementById("mp_qrcode").innerHTML = statusText);
   };
 
   mpin.prototype.renderMobileSetup = function () {
@@ -1335,7 +1415,7 @@ var mpin = mpin || {};
   };
   mpin.prototype.renderSetupDone = function () {
     var callbacks = {}, self = this, userId;
-    userId =  this.readIdentity() || this.identity;
+    userId = this.readIdentity() || this.identity;
     callbacks.mpin_home = function () {
       self.renderHome.call(self);
     };
@@ -1712,7 +1792,7 @@ var mpin = mpin || {};
   mpin.prototype.actionSetupHome = function (uId) {
     var self = this, _email, _deviceName, _deviceNameInput, removeError, elems = [];
 
-    _email = (uId) ? uId : document.getElementById("emailInput").value;
+    _email = (uId) ? uId : document.getElementById("emailInput").value.toLowerCase();
     _deviceNameInput = (document.getElementById("deviceInput")) ? document.getElementById("deviceInput").value.trim() : "";
 
     if ((_email.length === 0 || !this.opts.identityCheckRegex.test(_email)) && !(this.opts.prerollid)) {
@@ -2302,6 +2382,7 @@ var mpin = mpin || {};
     "signin_btn_mobile1": "Sign in with Smartphone",
     "signin_mobile_btn_text": "Sign in with your Smartphone",
     "signin_mobile_header": "Sign in with your phone",
+    "scan_mobile_header": "Scan with the M-Pin app",
     "signin_mobile_btn_text2": "Sign in with phone",
     "signin_button_mobile": "Sign in with Phone",
     "signin_btn_mobile2": "(This is a PUBLIC device I DO NOT trust)",
