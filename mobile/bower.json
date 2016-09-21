@@ -6,7 +6,7 @@
     "MILAGRO"
   ],
   "dependencies": {
-    "milagro-crypto": "https://github.com/miracl/milagro-crypto.git#1.0.0",
+    "milagro-crypto": "https://github.com/apache/incubator-milagro-crypto.git#1.0.0",
     "qrcodejs": "0.1.0",
     "handlebars": "~3.0.3"
   },
