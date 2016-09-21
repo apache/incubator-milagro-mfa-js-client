@@ -232,8 +232,6 @@ var mpin = mpin || {};
         this.opts[_optionName] = options[_optionName];
     }
 
-    MPINAuth.hash_val = this.opts.seedValue;
-
     return this;
   };
   mpin.prototype.addHelp = function () {
